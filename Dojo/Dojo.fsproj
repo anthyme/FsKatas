@@ -55,6 +55,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Dojo.fs" />
     <Compile Include="BankAccount.fs" />
+    <Compile Include="FizzBuzz.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
