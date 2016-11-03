@@ -56,6 +56,7 @@
     <Compile Include="Dojo.fs" />
     <Compile Include="BankAccount.fs" />
     <Compile Include="FizzBuzz.fs" />
+    <Compile Include="RomanNumber.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
