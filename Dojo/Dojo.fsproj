@@ -57,6 +57,7 @@
     <Compile Include="BankAccount.fs" />
     <Compile Include="FizzBuzz.fs" />
     <Compile Include="RomanNumber.fs" />
+    <Compile Include="FruitShop.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
