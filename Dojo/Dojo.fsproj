@@ -59,6 +59,7 @@
     <Compile Include="RomanNumber.fs" />
     <Compile Include="FruitShop.fs" />
     <Compile Include="MarsRover.fs" />
+    <Compile Include="Sokoban.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
