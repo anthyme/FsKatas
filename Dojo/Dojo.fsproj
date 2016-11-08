@@ -58,6 +58,7 @@
     <Compile Include="FizzBuzz.fs" />
     <Compile Include="RomanNumber.fs" />
     <Compile Include="FruitShop.fs" />
+    <Compile Include="MarsRover.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
