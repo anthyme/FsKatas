@@ -53,13 +53,14 @@
     <Content Include="packages.config" />
     <Content Include="App.config" />
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Dojo.fs" />
+    <Compile Include="Helper.fs" />
     <Compile Include="BankAccount.fs" />
     <Compile Include="FizzBuzz.fs" />
     <Compile Include="RomanNumber.fs" />
     <Compile Include="FruitShop.fs" />
     <Compile Include="MarsRover.fs" />
     <Compile Include="Sokoban.fs" />
+    <Compile Include="TexasPoker.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
