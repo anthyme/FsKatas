@@ -29,8 +29,7 @@ let (|IsFlush|_|) cards = getGroups suitOf 5 cards >= 1 |> ifSome IsFlush
 
 let (|RankStraight|SameRank|Nothing|) (a,b) =
     match a, b, compare a b with
-    | Ace,Two,_ -> RankStraight
-    | _,_,-1 -> RankStraight
+    | Ace,Two,_ | _,_,-1 -> RankStraight
     | _,_, 0 -> SameRank
     | _ -> Nothing
 
