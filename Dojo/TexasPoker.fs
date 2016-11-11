@@ -1,50 +1,56 @@
 ﻿module TexasPoker
 
+open Helpers
+
 type Suit = Spade|Heart|Club|Diamond
 type Rank = Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Jack|Queen|King|Ace
 type Card = Rank * Suit  
 type Combination = HighCard|OnePair|TwoPair|ThreeSame|Straight|Flush|FullHouse|FourSame|StraightFlush|RoyalStraightFlush
 
-let parseSuit = function 's' -> Spade | 'h' -> Heart | 'c' -> Club | 'd' -> Diamond | x -> failwith (sprintf "unknown suit %c" x)
+let rankOf card = fst card
+let suitOf card = snd card
+
+let parseSuit = function 's' -> Spade | 'h' -> Heart | 'c' -> Club | 'd' -> Diamond
 
 let parseRank = function 
     | 'T' -> Ten | 'J' -> Jack | 'Q' -> Queen | 'K' -> King | 'A' -> Ace
-    | x when Seq.contains (x |> string |> int) [2..9] -> [Two;Three;Four;Five;Six;Seven;Eight;Nine].[(x |> string |> int) - 2]
-    | x -> failwith (sprintf "unknown rank %c" x)
+    | x -> [Two;Three;Four;Five;Six;Seven;Eight;Nine].[(int << string) x - 2]
             
 let convertCardSet (txt:string) = txt.Split([|' '|]) |> Seq.map (fun x -> parseRank x.[0], parseSuit x.[1]) |> List.ofSeq
 
 let getGroups f size cards = 
-    Seq.groupBy f cards |> Seq.map (fun (r,s) -> r,Seq.length s) |> (Seq.filter (snd >> (=) size) >> Seq.length)
-
-let ifSome value boolean = if boolean then Some value else None
+    Seq.groupBy f cards |> Seq.map (Tuple.mapSnd Seq.length) |> (Seq.filter (snd >> (=) size) >> Seq.length)
 
 let (|IsGroup|_|) pair three four cards = 
     let check size expected = getGroups fst size cards >= expected
     ((check 4 four) && (check 2 pair) && (check 3 three)) |> ifSome IsGroup
     
-let (|IsFlush|_|) cards = getGroups snd 5 cards >= 1 |> ifSome IsFlush
+let (|IsFlush|_|) cards = getGroups suitOf 5 cards >= 1 |> ifSome IsFlush
 
-let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) cards = 
-    let compareCard a b = match fst a, fst b with | Ace,Two -> -1 | a,b -> compare a b
+let (|RankStraight|SameRank|Nothing|) (a,b) =
+    match a, b, compare a b with
+    | Ace,Two,_ -> RankStraight
+    | _,_,-1 -> RankStraight
+    | _,_, 0 -> SameRank
+    | _ -> Nothing
+
+let (|CardStraight|Nothing|) cards =
     let folder cards card =
         match cards,card with
         | [],c -> [c]
         | cards,_ when Seq.length cards = 5 -> cards
-        | head::tail,c when compareCard head c = -1 -> c :: cards
-        | head::tail,c when compareCard head c = 0 -> cards
+        | head::tail,c -> Tuple.map rankOf (head,c) |> function RankStraight -> c :: cards | SameRank -> cards | _ -> []
         | _ -> []
-    let isStraight cards =
-        let initial = match List.last cards with Ace,s -> [Ace,s] | _ -> []
-        Seq.fold folder initial cards |> Seq.length |> (=) 5 
+    let initial = match List.last cards with Ace,s -> [Ace,s] | _ -> []
+    match Seq.fold folder initial cards |> Seq.length with 5 -> CardStraight | _ -> Nothing 
 
-    let flushs = Seq.groupBy snd cards |> Seq.filter (snd >> Seq.length >> (<=) 5) |> Seq.map (snd >> List.ofSeq) |> Seq.tryHead
+let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) cards = 
+    let flushs = Seq.groupBy suitOf cards |> Seq.filter (suitOf >> Seq.length >> (<=) 5) |> Seq.map (suitOf >> List.ofSeq) |> Seq.tryHead
     match cards,flushs with
     | _, Some([_; Ten,_; Jack,_; Queen,_; King,_; Ace,_]) -> IsRoyalStraightFlush
-    | _, Some(flushs) when isStraight flushs -> IsStraightFlush
-    | cards,_ when isStraight cards -> IsStraight
+    | _, Some(CardStraight) -> IsStraightFlush
+    | CardStraight, _  -> IsStraight
     | _ -> Nothing
-
 
 let findCombination (cardSet:string) = 
     match cardSet |> convertCardSet |> List.sort with
