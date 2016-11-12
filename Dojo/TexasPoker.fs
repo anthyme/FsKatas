@@ -22,7 +22,7 @@ module Helpers =
     let convertCardSet (txt:string) = txt.Split([|' '|]) |> Seq.map (fun x -> parseRank x.[0], parseSuit x.[1]) |> List.ofSeq
 
     let getGroups f size cards = 
-        Seq.groupBy f cards |> Seq.map (Tuple.mapSnd Seq.length) |> (Seq.filter (snd >> (=) size) >> Seq.length)
+        Seq.groupBy f cards |> Seq.map (Tuple.mapSnd Seq.length) |> Seq.filter (snd >> (=) size) |> Seq.length
 
     let (|IsFlush|_|) cards = getGroups suitOf 5 cards >= 1 |> ifSome IsFlush
 
@@ -44,9 +44,21 @@ module Helpers =
 
 [<AutoOpen>]
 module CombinationActivePatterns =
-    let (|IsGroup|_|) pair three four cards = 
-        let check size expected = getGroups rankOf size cards >= expected
-        ((check 4 four) && (check 2 pair) && (check 3 three)) |> ifSome IsGroup
+    let (|IsGroup|_|) pair three four cards =
+        let getGroups f size cards = 
+            Seq.groupBy f cards |> Seq.map (Tuple.mapSnd Seq.length) |> Seq.filter (snd >> (=) size)
+        
+        let check size expected = 
+            let groups = getGroups rankOf size cards
+            match Seq.length groups >= expected with
+            | true -> true, (groups |> Seq.map fst |> Seq.sort |> List.ofSeq)
+            | _ -> false, []
+
+        let checked4, cards4 = check 4 four
+        let checked3, cards3 = check 3 three
+        let checked2, cards2 = check 2 pair
+
+        (checked4 && checked3 && checked2) |> ifSome IsGroup //( cards4 @ cards3 @ cards2)
 
     let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) cards = 
         let flushs = Seq.groupBy suitOf cards |> Seq.filter (suitOf >> Seq.length >> (<=) 5) |> Seq.map (suitOf >> List.ofSeq) |> Seq.tryHead
