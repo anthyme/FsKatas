@@ -45,7 +45,7 @@ module Helpers =
 [<AutoOpen>]
 module CombinationActivePatterns =
     let (|IsGroup|_|) pair three four cards = 
-        let check size expected = getGroups fst size cards >= expected
+        let check size expected = getGroups rankOf size cards >= expected
         ((check 4 four) && (check 2 pair) && (check 3 three)) |> ifSome IsGroup
 
     let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) cards = 
