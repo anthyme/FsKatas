@@ -21,16 +21,14 @@ let computeScore line =
         | '/' -> Spare
         | x -> Knock (Int.ofChar x)
 
+    let valueOf = function | Knock x -> x | _ -> 0
+
     let folder (state:State) shot = 
         let increment, frame =
             match state.Last, shot with
-            | Spared, Knock x -> (x + 10, FirstShot shot)
-            | Spared, Miss -> (10, FirstShot shot)
-            | FirstShot(Knock x), Knock y -> (x + y, SimpleShots)
-            | FirstShot(Knock x), Miss -> x, SimpleShots
-            | FirstShot(_), Miss -> 0, SimpleShots
-            | FirstShot(_), Knock x -> x, SimpleShots
-            | _, Spare -> 0, Spared
+            | _, Spare -> 10, Spared
+            | Spared, shot -> (valueOf shot, FirstShot shot)
+            | FirstShot(shot1), shot2 -> (valueOf shot1 + valueOf shot2, SimpleShots)
             | _, shot -> 0, FirstShot(shot)
 
         {Score = state.Score + increment ; Last = frame}
