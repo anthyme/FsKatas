@@ -25,9 +25,11 @@ let computeScore line =
         let increment, frame =
             match state.Last, shot with
             | Spared, Knock x -> (x + 10, FirstShot shot)
+            | Spared, Miss -> (10, FirstShot shot)
             | FirstShot(Knock x), Knock y -> (x + y, SimpleShots)
             | FirstShot(Knock x), Miss -> x, SimpleShots
             | FirstShot(_), Miss -> 0, SimpleShots
+            | FirstShot(_), Knock x -> x, SimpleShots
             | _, Spare -> 0, Spared
             | _, shot -> 0, FirstShot(shot)
 
@@ -53,4 +55,8 @@ module Tests =
         [<Fact>]
         let ``compute mixed simple and spares`` () = 
             "5/2/5/5/5/5/345/5/5/5" |> computeScore |> should equal (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+3 + 3+4 + 10+5 + 10+5 + 10+5)
+
+        [<Fact>]
+        let ``compute mixed simple, miss and spares`` () = 
+            "5/2/5/5/5/5/-45/5/5/5" |> computeScore |> should equal (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+0 + 0+4 + 10+5 + 10+5 + 10+5)
         
