@@ -61,6 +61,7 @@
     <Compile Include="MarsRover.fs" />
     <Compile Include="Sokoban.fs" />
     <Compile Include="TexasPoker.fs" />
+    <Compile Include="Bowling.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
