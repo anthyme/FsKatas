@@ -3,6 +3,7 @@
 [<AutoOpen>]
 module Option =
     let ifSome value boolean = if boolean then Some value else None
+    let (|?) = defaultArg
 
 module Tuple =
     let map f (a,b) = (f a, f b)

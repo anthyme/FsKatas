@@ -37,6 +37,13 @@ module Helpers =
         |> Seq.append combinationCards
         |> List.ofSeq
 
+    let extractFlushCards cards =
+        cards
+        |> Seq.groupBy suitOf
+        |> Seq.filter (suitOf >> Seq.length >> (<=) 5) 
+        |> Seq.map (suitOf >> List.ofSeq) 
+        |> Seq.tryHead
+
     let (|RankFollowing|SameRank|Nothing|) (a,b) =
         match a, b, compare a b with
         | Ace,Two,_ | _,_,-1 -> RankFollowing
@@ -54,16 +61,25 @@ module Helpers =
                               | _ -> []
             | _ -> []
 
-        cards
-        |> Seq.fold folder (List.last cards |> function | Ace,s -> [Ace,s] | _ -> []) 
-        |> Seq.length
-        |> function
-        | 5 -> CardFollowing 
-        | _ -> Nothing
+        match cards with 
+        | [] -> Nothing
+        | cards -> cards
+                   |> Seq.fold folder (List.last cards |> function | (Ace,s) -> [Ace,s] | _ -> []) 
+                   |> Seq.length
+                   |> function
+                   | 5 -> CardFollowing 
+                   | _ -> Nothing
+
+    let (|TenToAce|_|) cards =
+        cards |> List.skip (Seq.length cards - abs 5) |> List.map fst
+        |> function [Ten;Jack;Queen;King;Ace] -> Some TenToAce | _ -> None
 
 [<AutoOpen>]
 module CombinationActivePatterns =
-    let (|IsFlush|_|) cards = getGroups suitOf 5 cards |> Seq.length >= 1 |> ifSome (IsFlush [])
+    let (|IsFlush|_|) cards =
+        extractFlushCards cards |> function
+        | Some(flushs) -> IsFlush (extract5BestCards flushs []) |> Some
+        | _ -> None
 
     let (|IsGroup|_|) expected2 expected3 expected4 (cards: Card list) =   
         let check groupSize expected = 
@@ -79,15 +95,12 @@ module CombinationActivePatterns =
         |> Tuple.mapSnd List.concat
         |> fun (groupMatched, matchedCards) -> ifSome (IsGroup (extract5BestCards matchedCards cards)) groupMatched
 
-    let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) (cards: Card list) = 
-        let flushs = Seq.groupBy suitOf (cards:Card list) 
-                    |> Seq.filter (suitOf >> Seq.length >> (<=) 5) 
-                    |> Seq.map (suitOf >> List.ofSeq) 
-                    |> Seq.tryHead
-        match cards,flushs with
-        | _, Some([_; Ten,_; Jack,_; Queen,_; King,_; Ace,_]) -> IsRoyalStraightFlush (Option.get flushs)
-        | _, Some(CardFollowing) -> IsStraightFlush (Option.get flushs)
-        | CardFollowing, _  -> IsStraight cards
+    let (|IsStraight|IsStraightFlush|IsRoyalStraightFlush|Nothing|) (cards: Card list) =
+        let flushs = extractFlushCards cards |? []
+        match flushs,cards with
+        | TenToAce, _ -> IsRoyalStraightFlush flushs
+        | CardFollowing, _ -> IsStraightFlush flushs
+        | _, CardFollowing  -> IsStraight cards
         | _ -> Nothing ([] :> Card list)
 
 let getHand (cardSet:string) = 
@@ -131,7 +144,7 @@ module Tests =
         [<Fact>] let ``is a four same`` ()                      = "2d 2h 2c 2s 3h Qh Tc" |> shouldMatchCombination FourSame
         [<Fact>] let ``is a straight flush`` ()                 = "2h 3h 4h 5h 6h Qh Tc" |> shouldMatchCombination StraightFlush
         [<Fact>] let ``is a straight flush starting by ace`` () = "Ah 2h 3h 4h 5h Qh Tc" |> shouldMatchCombination StraightFlush
-        [<Fact>] let ``is a royal straight flush`` ()           = "Ah Kh Qh Jh Th 5h Tc" |> shouldMatchCombination RoyalStraightFlush
+        [<Fact>] let ``is a royal straight flush`` ()           = "Ah Kh Qh Jh Th As 8h" |> shouldMatchCombination RoyalStraightFlush
 
         [<Fact>] let ``one pair is better than high card`` ()   = "3d 8h Qh Tc Kc 2d 2h" |> shouldBeBetterThan "Ad 2h 3d 8h Qh Tc Kc"
         [<Fact>] let ``four same is better than one pair`` ()   = "2d 2h 2c 2s 3h Qh Tc" |> shouldBeBetterThan "3d 8h Qh Tc Kc 2d 2h"
