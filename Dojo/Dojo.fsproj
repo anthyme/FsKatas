@@ -64,6 +64,7 @@
     <Compile Include="MarsRover.fs" />
     <Compile Include="Sokoban.fs" />
     <Compile Include="TexasPoker.fs" />
+    <Compile Include="Bowling.fs" />
     <Compile Include="Diamond.fs" />
   </ItemGroup>
   <ItemGroup>
