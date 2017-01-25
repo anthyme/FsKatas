@@ -1,8 +1,12 @@
 ﻿module Anagram
 
+open Helpers
+open System.Net.Http
+
+let wordsUrl = "http://codekata.com/data/wordlist.txt"
+let words = HttpClient().GetAsync(wordsUrl).Result.Content.ReadAsStringAsync().Result |> String.split '\n' |> List.ofSeq
 
 let findAnagram word = ["god"]
-
 
 module Tests = 
     open Xunit
@@ -10,4 +14,4 @@ module Tests =
 
     type ``Given an anagram finder``() = 
         [<Fact>] 
-        let ``foo should give oof``() = findAnagram "dog" |> should contain "god"
+        let ``dog should give god``() = findAnagram "dog" |> should contain "god"
