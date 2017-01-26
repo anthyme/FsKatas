@@ -19,3 +19,9 @@ module String =
 module Int =
     let ofChar = (string >> int)
 
+module Http =
+    open System.Net.Http
+    let get (url:string) = 
+        use httpClient = new HttpClient()
+        httpClient.GetAsync(url).Result.Content.ReadAsStringAsync().Result
+
