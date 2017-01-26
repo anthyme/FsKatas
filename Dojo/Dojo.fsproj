@@ -67,6 +67,7 @@
     <Compile Include="Bowling.fs" />
     <Compile Include="Diamond.fs" />
     <Compile Include="Anagram.fs" />
+    <Compile Include="Castle.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

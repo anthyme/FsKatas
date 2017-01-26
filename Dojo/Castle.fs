@@ -16,6 +16,7 @@ module Models =
 
     type Dé = Récolte | Commerce | Peste | Grêle | Médicaments
 
+    type EtatCité = CitéVivante of Cité | CitéMorte
 
 [<AutoOpen>]
 module Helpers =
@@ -41,7 +42,6 @@ module Helpers =
         | 5 -> Grêle 
         | 6 -> Médicaments
 
-
 [<AutoOpen>]
 module Logic =
     let evolue (cité: Cité) = 
@@ -51,7 +51,7 @@ module Logic =
         | Peste ->       { cité with Santé  = enlever1 cité.Santé }
         | Grêle ->       { cité with Blé    = enlever1 cité.Blé }
         | Médicaments -> { cité with Santé  = ajouter1 cité.Santé }
-    //    |> CitéVivante
+        |> CitéVivante
 
     let enroler1armée (cité: Cité) =
         if cité.Armée < 10 && cité.Or > 0 && cité.PopulationCivile > 0
@@ -59,9 +59,7 @@ module Logic =
                          PopulationCivile = enlever1 cité.PopulationCivile
                          Armée = ajouter1 cité.Armée }
         else cité
-    //    |> CitéVivante
 
-   
     let effetSanté = function
         | santé when santé < 2 -> enlever2
         | santé when santé < 4 -> enlever1
@@ -77,48 +75,21 @@ module Logic =
     let appliquerEffets cité = 
         { cité with PopulationCivile = cité.PopulationCivile |> effetSanté cité.Santé
                     Santé = cité.Santé |> effetBlé cité.Blé }
-    //    |> CitéVivante
-
+        |> CitéVivante
 
     let citéTombeOuPas cité =
         if cité.PopulationCivile = minJauge
             || estMaximum cité.PopulationCivile 
             || estMaximum cité.Armée 
-        then cité
-        else failwith "t'es mort mec"
-//        then CitéVivante cité
-//        else CitéMorte
+        then CitéVivante cité
+        else CitéMorte
 
+let (>=>) switch1 switch2 x = 
+    match switch1 x with
+    | CitéVivante x -> switch2 x
+    | CitéMorte -> CitéMorte
 
-let jouer1Tour cité =  
-    cité |> evolue |> appliquerEffets |> citéTombeOuPas
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-type EtatCité =
-    | CitéVivante of Cité
-    | CitéMorte
-
-let (>>=) f étatCité = 
-    match étatCité with
-    | CitéVivante x -> f x
-    | _ -> CitéMorte
-
-let jouer1Tour étatCité =  étatCité >>= evolue >>= appliquerEffets >>= citéTombeOuPas
-
-
+let jouer1Tour =
+    evolue 
+    >=> appliquerEffets 
+    >=> citéTombeOuPas
