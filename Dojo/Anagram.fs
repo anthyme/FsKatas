@@ -6,6 +6,7 @@ let words = Http.get "http://codekata.com/data/wordlist.txt" |> String.split '\n
 let getKey word = word |> Seq.sortBy int |> Seq.map string |> String.concat ""
 let dictionary = words |> Seq.groupBy getKey |> Map.ofSeq
 let findAnagram word = dictionary.[getKey word] |> Seq.filter ((<>) word) 
+
 module Tests = 
     open Xunit
     open FsUnit.Xunit
