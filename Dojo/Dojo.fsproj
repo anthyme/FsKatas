@@ -68,6 +68,7 @@
     <Compile Include="Diamond.fs" />
     <Compile Include="Anagram.fs" />
     <Compile Include="Castle.fs" />
+    <Compile Include="Reversi.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

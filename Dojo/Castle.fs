@@ -84,10 +84,7 @@ module Logic =
         then CitéVivante cité
         else CitéMorte
 
-let (>=>) switch1 switch2 x = 
-    match switch1 x with
-    | CitéVivante x -> switch2 x
-    | CitéMorte -> CitéMorte
+let (>=>) f g x = match f x with | CitéVivante x -> g x | _ -> CitéMorte
 
 let jouer1Tour =
     evolue 
