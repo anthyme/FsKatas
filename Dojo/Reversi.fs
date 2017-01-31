@@ -2,64 +2,51 @@
 
 type Player = White | Black
 type Position = int * int
-type Direction = int * int
-type PawnPosition = Player * Position
+type Pawn = { Player:Player; Position:Position }
 
-let BOARD_SIZE = 8
+let boardSize = 8
 let directions = [(-1,-1);(-1,0);(-1,1);(0,-1);(0,1);(1,-1);(1,0);(1,1)]
 
-type ValidFinder<'a> = Continue of 'a | Found of bool
-let bind f = function | Continue s -> f s | Found x -> Found x
-let (>>=) a b = bind b a 
+type PathParser<'a> = Ok of 'a | Result of bool with static member map = function Some x -> Ok x | _ -> Result false
+let (>>=) v f = match v with | Ok s -> f s | Result x -> Result x
 
-let nextPosition ((x,y),(dx,dy)) = (x+dx , y+dy) |> Continue
+let nextPosition (x,y) (dx,dy) = (x+dx , y+dy)
 
-let isInBoard (x,y) = if x >= 0 && y >= 0 && x < BOARD_SIZE && y < BOARD_SIZE then Continue (x,y) else Found false
+let isInBoard (x,y) = if x >= 0 && y >= 0 && x < boardSize && y < boardSize then Ok (x,y) else Result false
 
-let hasPound pawns (x,y) = 
-    pawns 
-    |> Seq.tryFind (snd >> (=) (x,y))
-    |> function | Some x -> Continue x | _ -> Found false
+let hasPound pawns (x,y) = pawns |> Seq.tryFind (fun p -> p.Position = (x,y)) |> PathParser.map
 
-let foundFriend player surronding ((pawnPlayer,_) as pawn) = 
-    if pawnPlayer = player && surronding then Found true else Continue pawn
+let foundFriend player surronding pawn = if pawn.Player = player && surronding then Result true else Ok pawn
 
-let checkSurronding player surronded (pawnPlayer,next) = 
-    let surrounding = if pawnPlayer <> player then true else surronded in Continue (next, surrounding)
+let checkSurronding player surronding pawn = (pawn, if pawn.Player <> player then true else surronding) |> Ok
 
-let rec isValidDirection position pawns surronding player direction =
-    (position,direction)
-    |> nextPosition 
-    >>= isInBoard
+let rec isValidPath pawns player surronding position direction =
+    nextPosition position direction
+    |> isInBoard
     >>= (hasPound pawns)
     >>= (foundFriend player surronding)
     >>= (checkSurronding player surronding)
-    |> function | Found isValid -> isValid | Continue (next,surronding) -> isValidDirection next pawns surronding player direction
+    |> function | Result isValid -> isValid 
+                | Ok (pawn,surronding) -> isValidPath pawns player surronding pawn.Position direction
 
-let isValidPosition pawns player position =
-    directions
-    |> Seq.map (isValidDirection position pawns false player)
-    |> Seq.exists ((=) true)
+let isValidBox pawns player position = directions |> Seq.map (isValidPath pawns player false position) |> Seq.exists ((=) true)
 
-let getReversiAvailableBoxes pawns nextPlayer =
-    [for x in [0..BOARD_SIZE-1] do for y in [0..BOARD_SIZE-1] do yield (x,y)] |> List.filter (isValidPosition pawns nextPlayer)
-
+let nextReversi pawns player = [for x in [0..boardSize-1] do for y in [0..boardSize-1] do yield (x,y)]
+                               |> List.filter (isValidBox pawns player)
 
 
 module Tests = 
     open Xunit
     open FsUnit.Xunit
 
-    type ``Given an get reversi available boxes``() = 
+    type ``Given an next reversi finder``() = 
         [<Fact>] 
-        let ``sample 1``() = 
-            getReversiAvailableBoxes [] Black |> should be Empty
+        let ``sample 1``() = nextReversi [] Black |> should be Empty
 
         [<Fact>] 
         let ``sample 2``() = 
-            let input = 
-                [Black, (4,4)
-                 Black, (3,3)
-                 White, (4,3)
-                 White, (3,4)]
-            getReversiAvailableBoxes input Black |> set |> should equal (set [(4,2);(2,4);(5,3);(3,5)])
+            let input = [{ Player = Black; Position = (4,4)}
+                         { Player = Black; Position = (3,3)}
+                         { Player = White; Position = (4,3)}
+                         { Player = White; Position = (3,4)}]
+            nextReversi input Black |> set |> should equal (set [(4,2);(2,4);(5,3);(3,5)])
