@@ -7,18 +7,18 @@ type Pawn = { Player:Player; Position:Position }
 let boardSize = 8
 let directions = [(-1,-1);(-1,0);(-1,1);(0,-1);(0,1);(1,-1);(1,0);(1,1)]
 
-type PathParser<'a> = Ok of 'a | Result of bool with static member map = function Some x -> Ok x | _ -> Result false
-let (>>=) v f = match v with | Ok s -> f s | Result x -> Result x
-
+type PathParser<'a> = Continue of 'a | Result of bool with static member map = function Some x -> Continue x | _ -> Result false
+let (>>=) v f = match v with | Continue s -> f s | Result x -> Result x
+    
 let nextPosition (x,y) (dx,dy) = (x+dx , y+dy)
 
-let isInBoard (x,y) = if x >= 0 && y >= 0 && x < boardSize && y < boardSize then Ok (x,y) else Result false
+let isInBoard (x,y) = if x >= 0 && y >= 0 && x < boardSize && y < boardSize then Continue (x,y) else Result false
 
 let hasPound pawns (x,y) = pawns |> Seq.tryFind (fun p -> p.Position = (x,y)) |> PathParser.map
 
-let foundFriend player surronding pawn = if pawn.Player = player && surronding then Result true else Ok pawn
+let foundFriend player surronding pawn = if pawn.Player = player && surronding then Result true else Continue pawn
 
-let checkSurronding player surronding pawn = (pawn, if pawn.Player <> player then true else surronding) |> Ok
+let checkSurronding player surronding pawn = (pawn, if pawn.Player <> player then true else surronding) |> Continue
 
 let rec isValidPath pawns player surronding position direction =
     nextPosition position direction
@@ -27,7 +27,7 @@ let rec isValidPath pawns player surronding position direction =
     >>= (foundFriend player surronding)
     >>= (checkSurronding player surronding)
     |> function | Result isValid -> isValid 
-                | Ok (pawn,surronding) -> isValidPath pawns player surronding pawn.Position direction
+                | Continue (pawn,surronding) -> isValidPath pawns player surronding pawn.Position direction
 
 let isValidBox pawns player position = directions |> Seq.map (isValidPath pawns player false position) |> Seq.exists ((=) true)
 
