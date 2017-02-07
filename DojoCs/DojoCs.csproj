@@ -67,6 +67,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PokerHand\Logic.cs" />
+    <Compile Include="PokerHand\Models.cs" />
     <Compile Include="PokerHand\PokerHandTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
