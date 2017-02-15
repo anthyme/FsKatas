@@ -1,20 +1,18 @@
 ﻿module RomanNumber
 
-let arabicToRoman (value:int) =
+open System
+
+let arabicToRoman value =
     let symbols = ["I"; "V"; "X"; "L"; "C"; "D"; "M"]
-    let generate x symbol = List.replicate x symbol |> List.fold (+) ""
-    let romanPattern symbol1 symbol2 = function
-        | 4 -> symbol1 + symbol2
-        | x -> symbol2 + (generate (x-5) symbol1)
-    let rec arabicToRoman' symbolPosition value =
-        let symbol i = symbols.[symbolPosition + i]
-        let roman =
-            match value % 10 with
-            | x when x < 4 -> generate x (symbol 0)
-            | x when x < 9 -> romanPattern (symbol 0) (symbol 1) x
-            | 9 -> (symbol 0) + (symbol 2)
-        match value / 10 with | x when x > 0 -> (arabicToRoman' (symbolPosition + 2) x) + roman | _ -> roman
-    arabicToRoman' 0 value
+    let rec loop position value =
+        let symbol i = symbols.[position + i]
+        let roman = match value % 10 with
+                    | x when x < 4 -> String(char (symbol 0), x)
+                    | 4            -> (symbol 0) + (symbol 1)
+                    | x when x < 9 -> (symbol 1) + String(char (symbol 0), x-5)
+                    | 9            -> (symbol 0) + (symbol 2)
+        match value / 10 with | 0 -> roman | x -> (loop (position+2) x) + roman
+    loop 0 value
 
 module Tests = 
     open Xunit
