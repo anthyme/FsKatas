@@ -3,9 +3,8 @@
 open System
 
 let arabicToRoman value =
-    let symbols = ["I"; "V"; "X"; "L"; "C"; "D"; "M"]
     let rec loop position value =
-        let symbol i = symbols.[position + i]
+        let symbol i = ["I";"V";"X";"L";"C";"D";"M"].[position+i]
         let roman = match value % 10 with
                     | x when x < 4 -> String(char (symbol 0), x)
                     | 4            -> (symbol 0) + (symbol 1)
