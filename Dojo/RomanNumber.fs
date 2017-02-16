@@ -2,13 +2,26 @@
 
 open System
 
+
 let arabicToRoman value =
     let rec loop position value =
         let symbol i = ["I";"V";"X";"L";"C";"D";"M"].[position+i]
         let roman = match value % 10 with
-                    | x when x < 4 -> String(char (symbol 0), x)
+                    | x when x < 4 -> List.replicate x 0
+                    | 4            -> [0;1]
+                    | x when x < 9 -> 1 :: List.replicate (x-5) 0
+                    | 9            -> [0;2]
+                    |> List.map symbol |> String.Concat
+        match value / 10 with | 0 -> roman | x -> (loop (position+2) x) + roman
+    loop 0 value 
+
+let arabicToRoman2 value =
+    let rec loop position value =
+        let symbol i = ["I";"V";"X";"L";"C";"D";"M"].[position+i]
+        let roman = match value % 10 with
+                    | x when x < 4 -> String.replicate x (symbol 0)
                     | 4            -> (symbol 0) + (symbol 1)
-                    | x when x < 9 -> (symbol 1) + String(char (symbol 0), x-5)
+                    | x when x < 9 -> (symbol 1) + String.replicate (x-5) (symbol 0)
                     | 9            -> (symbol 0) + (symbol 2)
         match value / 10 with | 0 -> roman | x -> (loop (position+2) x) + roman
     loop 0 value
