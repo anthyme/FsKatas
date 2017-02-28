@@ -31,14 +31,14 @@ let checkout basket (command:string) = command.Split(',') |> Seq.map parseProduc
 
 module Tests = 
     open Xunit
-    open FsUnit.Xunit
+    open Helpers
 
     type ``Given checkout``() =
         let emptyBasket = []
 
         let check input expected basket = 
             let newBasket, result = checkout basket input
-            expected |> should equal result
+            expected |> ``should equal`` result
             newBasket
 
         [<Fact>]

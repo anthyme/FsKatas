@@ -7,7 +7,7 @@ let fizzBuzz2 x =
 
 module Tests = 
     open Xunit
-    open Swensen.Unquote
+    open Helpers
 
     type ``Given a fizzbuzz``() =
         let cases = 
@@ -31,9 +31,9 @@ module Tests =
             ]
         [<Fact>]
         let ``should match cases``() = 
-            cases |> Seq.iter (fun (input,expected) -> test <@ fizzBuzz input = expected @>)
+            cases |> Seq.iter (fun (input,expected) -> fizzBuzz input |> ``should equal`` expected)
 
         [<Fact>]
         let ``should match cases 2``() = 
-            cases |> Seq.iter (fun (input,expected) -> test <@ fizzBuzz2 input = expected @>)
+            cases |> Seq.iter (fun (input,expected) -> fizzBuzz2 input |> ``should equal`` expected)
             

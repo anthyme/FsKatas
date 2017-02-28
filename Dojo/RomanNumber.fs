@@ -28,7 +28,7 @@ let arabicToRoman2 value =
 
 module Tests = 
     open Xunit
-    open FsUnit.Xunit
+    open Helpers
 
     let testCases = 
         Map [
@@ -59,4 +59,4 @@ module Tests =
     type ``Given an arabicToRoman converter``() = 
         [<Fact>] 
         let ``should match cases``() = 
-            testCases |> Map.iter (fun arabic roman -> arabic |> arabicToRoman |> should equal roman)
+            testCases |> Map.iter (fun arabic roman -> arabic |> arabicToRoman |> ``should equal`` roman)

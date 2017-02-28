@@ -39,7 +39,7 @@ let reduce query transactions  =
 /// Tests
 
 open Xunit
-open FsUnit.Xunit
+open Helpers
 
 type ``Given an account``() = 
     let now = DateTime.UtcNow
@@ -51,7 +51,7 @@ type ``Given an account``() =
 
     let Given events = Seq.fold apply { Balance = 0; Transactions = []} (List.rev events)
     let When date command state = (operate state command date, state)
-    let Then expected (result, state)  = apply state result |> should equal expected
+    let Then expected (result, state)  = apply state result |> ``should equal`` expected
 
     [<Fact>]
     let ``with an empty account when 100 deposit then the account should be 100``() =
@@ -72,23 +72,23 @@ type ``Given an account``() =
     let ``with transactions when query deposits then only deposits should be retrieved``() =
         [date2,Withdrawed(20);date1,Deposited(100); date0,Deposited(1000)]
         |> reduce Deposits
-        |> should equal [date1,Deposited(100); date0,Deposited(1000)]
+        |> ``should equal`` [date1,Deposited(100); date0,Deposited(1000)]
 
     [<Fact>]
     let ``with transactions when query withdrawals then only withdrawals should be retrieved``() =
         [date2,Withdrawed(20);date1,Deposited(100); date0,Deposited(1000)]
         |> reduce Withdraws
-        |> should equal [date2,Withdrawed(20)]
+        |> ``should equal`` [date2,Withdrawed(20)]
 
     [<Fact>]
     let ``with transactions when Last 2 then only the 2 lasts deposits should be retrieved``() =
         [date2,Withdrawed(20);date1,Deposited(100); date0,Deposited(1000)]
         |> reduce (Last 2)  
-        |> should equal [date2,Withdrawed(20);date1,Deposited(100)]
+        |> ``should equal`` [date2,Withdrawed(20);date1,Deposited(100)]
 
     [<Fact>]
     let ``with transactions when order by date and last 2 then only first 2 should be retrieved``() =
         [date2,Withdrawed(20);date1,Deposited(100); date0,Deposited(1000)]
         |> reduce OrderByDate
         |> reduce (Last 2)
-        |> should equal [date0,Deposited(1000);date1,Deposited(100)]
+        |> ``should equal`` [date0,Deposited(1000);date1,Deposited(100)]

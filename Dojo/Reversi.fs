@@ -37,11 +37,11 @@ let nextReversi pawns player = [for x in [0..boardSize-1] do for y in [0..boardS
 
 module Tests = 
     open Xunit
-    open FsUnit.Xunit
+    open Helpers
 
     type ``Given an next reversi finder``() = 
         [<Fact>] 
-        let ``sample 1``() = nextReversi [] Black |> should be Empty
+        let ``sample 1``() = nextReversi [] Black |> ``should be empty``
 
         [<Fact>] 
         let ``sample 2``() = 
@@ -49,4 +49,4 @@ module Tests =
                          { Player = Black; Position = (3,3)}
                          { Player = White; Position = (4,3)}
                          { Player = White; Position = (3,4)}]
-            nextReversi input Black |> set |> should equal (set [(4,2);(2,4);(5,3);(3,5)])
+            nextReversi input Black |> set |> ``should equal`` (set [(4,2);(2,4);(5,3);(3,5)])

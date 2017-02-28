@@ -48,29 +48,28 @@ let computeScore line =
     result.Score
 
 module Tests =
-    open FsUnit.Xunit
     open Xunit
 
     type ``Given a computeScore`` () =
 
         [<Fact>]
         let ``compute simple facts`` () = 
-            "9-9-9-9-9-9-9-9-9-9-" |> computeScore |> should equal (9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9)
+            "9-9-9-9-9-9-9-9-9-9-" |> computeScore |> ``should equal`` (9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9 + 9)
 
         [<Fact>]
         let ``compute spares`` () = 
-            "5/5/5/5/5/5/5/5/5/5/5" |> computeScore |> should equal (10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5)
+            "5/5/5/5/5/5/5/5/5/5/5" |> computeScore |> ``should equal`` (10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5 + 10+5)
 
         [<Fact>]
         let ``compute mixed simple and spares`` () = 
-            "5/2/5/5/5/5/345/5/5/5" |> computeScore |> should equal (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+3 + 3+4 + 10+5 + 10+5 + 10+5)
+            "5/2/5/5/5/5/345/5/5/5" |> computeScore |> ``should equal`` (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+3 + 3+4 + 10+5 + 10+5 + 10+5)
 
         [<Fact>]
         let ``compute mixed simple, miss and spares`` () = 
-            "5/2/5/5/5/5/-45/5/5/5" |> computeScore |> should equal (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+0 + 0+4 + 10+5 + 10+5 + 10+5)
+            "5/2/5/5/5/5/-45/5/5/5" |> computeScore |> ``should equal`` (10+5 + 10+2 + 10+5 + 10+5 + 10+5 + 10+0 + 0+4 + 10+5 + 10+5 + 10+5)
 
 //        //need more work
 //        [<Fact>]
 //        let ``compute strikes`` () = 
-//            "XXXXXXXXXXXX" |> computeScore |> should equal (10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10)
+//            "XXXXXXXXXXXX" |> computeScore |> ``should equal`` (10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10 + 10+10+10)
         

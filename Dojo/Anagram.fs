@@ -9,10 +9,10 @@ let findAnagram word = dictionary.[getKey word] |> Seq.filter ((<>) word)
 
 module Tests = 
     open Xunit
-    open FsUnit.Xunit
+    open Helpers
 
     type ``Given an anagram finder``() = 
         [<Fact>] 
-        let ``dog should give god``() = findAnagram "dog" |> should contain "god"
+        let ``dog should give god``() = findAnagram "dog" |> ``should contain`` "god"
         [<Fact>] 
-        let ``hello has no anagram``() = findAnagram "hello" |> should be Empty
+        let ``hello has no anagram``() = findAnagram "hello" |> ``should be empty``

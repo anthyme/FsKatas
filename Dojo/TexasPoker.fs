@@ -120,13 +120,13 @@ let compareCardSets cardSet1 cardSet2  =
     [cardSet1;cardSet2] |> List.map (getHand >> (Tuple.mapSnd (List.map rankOf))) |> Tuple.ofList ||> compare
 
 module Tests =
-    open FsUnit.Xunit
     open Xunit
+    open Helpers
 
     type ``Given a card set`` () =
-        let shouldConvertTo result cardSet = cardSet |> convertCardSet |> should equal result
-        let shouldMatchCombination result cardSet = cardSet |> getHand |> fst |> should equal result
-        let shouldBeBetterThan cardSet1 cardSet2 = compareCardSets cardSet1 cardSet2 |> should be (lessThan 0)
+        let shouldConvertTo result cardSet = cardSet |> convertCardSet |> ``should equal`` result
+        let shouldMatchCombination result cardSet = cardSet |> getHand |> fst |> ``should equal`` result
+        let shouldBeBetterThan cardSet1 cardSet2 = compareCardSets cardSet1 cardSet2 |> ``should be less than`` 0
 
         [<Fact>] 
         let ``is convertible to model``() = 

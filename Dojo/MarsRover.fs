@@ -44,24 +44,24 @@ let sphereMove (input:string) =
     Seq.fold reduce initialState moves |> formatState
 
 
-
-open Xunit
-open FsUnit.Xunit
-
 module Tests = 
+
+    open Xunit
+    open Helpers
+
     type ``Given a stuff``() = 
-        [<Fact>] let ``simple move``() =  "20 20\n5 15 N\nFFFFFRBBLFLLLFFFFF" |> sphereMove |> should equal "8 9 E"
+        [<Fact>] let ``simple move``() =  "20 20\n5 15 N\nFFFFFRBBLFLLLFFFFF" |> sphereMove |> ``should equal`` "8 9 E"
 
         [<Fact>]
         let ``sphere move1``() = 
             "5 5\n\
             0 0 N\n\
             F" 
-            |> sphereMove |> should equal "0 4 N"
+            |> sphereMove |> ``should equal`` "0 4 N"
 
         [<Fact>]
         let ``sphere move2``() = 
             "5 5\n\
             0 0 E\n\
             BLL" 
-            |> sphereMove |> should equal "4 0 W"
+            |> sphereMove |> ``should equal`` "4 0 W"

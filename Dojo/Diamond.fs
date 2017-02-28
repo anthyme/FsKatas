@@ -24,7 +24,7 @@ let createDiamond letter =
 
 module Tests = 
     open Xunit
-    open FsUnit.Xunit
+    open Helpers
 
     type ``Given a letter should return the right diamond``() = 
         let diamondB = " A \n" +
@@ -49,12 +49,12 @@ module Tests =
                        "    B B    \n" +
                        "     A     \n"
     
-        [<Fact>] member x.``Given A should return the A diamond``() = createDiamond 'A' |> should equal "A\n"
-        [<Fact>] member x.``Given B should return the B diamond``() = createDiamond 'B' |> should equal diamondB
-        [<Fact>] member x.``Given C should return the C diamond``() = createDiamond 'C' |> should equal diamondC
-        [<Fact>] member x.``Given F should return the F diamond``() = createDiamond 'F' |> should equal diamondF
+        [<Fact>] member x.``Given A should return the A diamond``() = createDiamond 'A' |> ``should equal`` "A\n"
+        [<Fact>] member x.``Given B should return the B diamond``() = createDiamond 'B' |> ``should equal`` diamondB
+        [<Fact>] member x.``Given C should return the C diamond``() = createDiamond 'C' |> ``should equal`` diamondC
+        [<Fact>] member x.``Given F should return the F diamond``() = createDiamond 'F' |> ``should equal`` diamondF
 
     type ``Given a char capital letter should return the correct position in alphabet``() = 
-        [<Fact>] member x.``Given 'A' should return 0 ``() = indexOf 'A' |> should equal 0
-        [<Fact>] member x.``Given 'B' should return 1 ``() = indexOf 'B' |> should equal 1
-        [<Fact>] member x.``Given 'Z' should return 25``() = indexOf 'Z' |> should equal 25
+        [<Fact>] member x.``Given 'A' should return 0 ``() = indexOf 'A' |> ``should equal`` 0
+        [<Fact>] member x.``Given 'B' should return 1 ``() = indexOf 'B' |> ``should equal`` 1
+        [<Fact>] member x.``Given 'Z' should return 25``() = indexOf 'Z' |> ``should equal`` 25
